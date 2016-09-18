@@ -93,6 +93,7 @@ This project module was developed at Georgetown University.
 |---------------------|-------------------|-------------|
 |WebannoTSV.namespace			    |String           |webanno|
 |WebannoTSV.lowerTypes  |true,false       |false|
+|WebannoTSV.tokAnnos  |String       | |
 
 ### namespace
 
@@ -105,3 +106,8 @@ If `true`, relation annotation types, which WebAnno capitalizes automatically,
 will be lower-cased. For example, if you have an edge annotation `coref`, the
 WebAnno TSV export function will rename it to `Coref`. By setting this property
 to `true`, the name will be `coref` again. Default is `false`.
+
+### tokAnnos
+
+Supplies a semicolon-separated list of annotation names which should be attached directly to token, without creating span nodes above the covered area. Example value:
+`pos;lemma` (if annotations called pos and lemma are present, they are attached directly to their token, without creating a non-terminal node above the token).

@@ -30,12 +30,22 @@ public class WebannoTSVAnnotation {
 	private final WebannoTSVAnnotationType type;
 	private final String nodeName;
 	private final String annoName;
+	private final int numSisters; // records the number of coordinate annotations this annotations element carries
 
     
     WebannoTSVAnnotation(WebannoTSVAnnotationType type, String nodeName, String annoName) {
 		this.type = type;
                 this.nodeName = nodeName;
                 this.annoName = annoName;
+                this.numSisters = 1;
+        
+    }
+
+    WebannoTSVAnnotation(WebannoTSVAnnotationType type, String nodeName, String annoName, int sisters) {
+		this.type = type;
+                this.nodeName = nodeName;
+                this.annoName = annoName;
+                this.numSisters = sisters;
         
     }
     
@@ -50,6 +60,10 @@ public class WebannoTSVAnnotation {
 
     public String getAnnoName() {
         return annoName;
+    }
+
+    public int getNumSisters() {
+        return numSisters;
     }
 
     @Override

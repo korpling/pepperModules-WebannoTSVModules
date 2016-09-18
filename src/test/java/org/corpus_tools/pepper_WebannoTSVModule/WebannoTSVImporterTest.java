@@ -1,6 +1,8 @@
 package org.corpus_tools.pepper_WebannoTSVModule;
 
+import org.corpus_tools.pepper.modules.PepperModuleProperties;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import org.corpus_tools.pepper.testFramework.PepperImporterTest;
 import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SDocument;
@@ -43,7 +45,7 @@ public class WebannoTSVImporterTest {
         
         
         @Test
-	public void testSentenceAnnotation()
+	public void testCustomAnnotation()
 	{
 	  getFixture().setResourceURI(URI.createFileURI("src/test/resources/GUM_webanno_test.tsv"));
 	  getFixture().mapSDocument();
@@ -60,9 +62,38 @@ public class WebannoTSVImporterTest {
           assertEquals(0, dg.getStructures().size());
           // checks that all pointing relations (subclass of relations) are
           // contained
-          assertEquals(117, dg.getPointingRelations().size());          
+          assertEquals(122, dg.getPointingRelations().size());          
           // checks that all relations are contained
-          assertEquals(2003, dg.getRelations().size());
+          assertEquals(2008, dg.getRelations().size());
         }
+        
+        @Test
+	public void testDepNER()
+	{
+	  getFixture().setResourceURI(URI.createFileURI("src/test/resources/PosDep.tsv"));
+          PepperModuleProperties props = new PepperModuleProperties();
+          props.setPropertyValue("WebannoTSV.tokAnnos", "PosValue");
+          props.setPropertyValue("WebannoTSV.lowerTypes", false);
+          getFixture().setProperties(props);
+	  getFixture().mapSDocument();
+	  
+	  SDocumentGraph dg = getFixture().getDocument().getDocumentGraph();
 
+          // check token count
+	  assertEquals(86, dg.getTokens().size());
+          // check that POS annotations were correctly attached to tokens
+          assertNotNull(dg.getTokens().get(0).getAnnotation("webanno","PosValue"));
+          // checks that all nodes are contained
+          assertEquals(92, dg.getNodes().size());
+          // checks that all spans (subclass of nodes) are contained
+          assertEquals(5, dg.getSpans().size());
+          // checks that all structures (subclass of nodes) are contained
+          assertEquals(0, dg.getStructures().size());
+          // checks that all pointing relations (subclass of relations) are
+          // contained
+          assertEquals(158, dg.getPointingRelations().size());          
+          assertEquals(true, (dg.getPointingRelations().size()>0));          
+          // checks that all relations are contained
+          assertEquals(254, dg.getRelations().size());
+        }
 }
