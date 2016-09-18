@@ -19,11 +19,13 @@ import org.corpus_tools.peppermodules.conll.tupleconnector.TupleReader;
 import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SPointingRelation;
 import org.corpus_tools.salt.common.SSpan;
+import org.corpus_tools.salt.common.SStructuredNode;
 import org.corpus_tools.salt.common.STextualDS;
 import org.corpus_tools.salt.common.STextualRelation;
 import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.SAnnotation;
 import org.corpus_tools.salt.core.SLayer;
+import org.corpus_tools.salt.core.SNode;
 import org.eclipse.emf.common.util.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +53,7 @@ import org.slf4j.LoggerFactory;
 public class WebannoTSV2SaltMapper extends PepperMapperImpl{
     
     private String namespace;
+    private String tokAnnos;
     private boolean lowercaseTypes;
     private SLayer layer;
 
@@ -85,6 +88,11 @@ public class WebannoTSV2SaltMapper extends PepperMapperImpl{
 
                 // assign customizationn values from importer properties
                 this.namespace = (String) getProperties().getProperties().getProperty(WebannoTSVImporterProperties.NAMESPACE, "webanno");
+                this.tokAnnos = (String) getProperties().getProperties().getProperty(WebannoTSVImporterProperties.TOK_ANNOS, "");
+                
+                String[] tokAnnoList;
+                tokAnnoList = this.tokAnnos.split(";");
+                
                 if (getProperties().getProperty(WebannoTSVImporterProperties.LOWER_TYPES).getValue() instanceof Boolean){
                     this.lowercaseTypes = (Boolean) getProperties().getProperty(WebannoTSVImporterProperties.LOWER_TYPES).getValue();                                                        
                 }
@@ -183,6 +191,7 @@ public class WebannoTSV2SaltMapper extends PepperMapperImpl{
                             if (annoSpecs.length > 1){
                                 nodeName = annoSpecs[0];
                                 nodeName = nodeName.replace("webanno.custom.", ""); // remove webanno.custom prefixes
+                                nodeName = nodeName.replaceAll("de.tudarmstadt.ukp.dkpro\\..+\\.", ""); // remove built in type prefixess
                                 if (this.lowercaseTypes){
                                     nodeName = nodeName.toLowerCase();
                                 }
@@ -194,7 +203,7 @@ public class WebannoTSV2SaltMapper extends PepperMapperImpl{
                                 }
                                 else if (nodeType == WebannoTSVAnnotationType.RELATION){
                                     for (String anno: Arrays.copyOfRange(annoSpecs, 1, annoSpecs.length-1)) {
-                                       annotations.add(new WebannoTSVAnnotation(nodeType,nodeName,anno));
+                                       annotations.add(new WebannoTSVAnnotation(nodeType,nodeName,anno,annoSpecs.length-2));
                                     }
                                     // Variable to hold type of edge target node - this may be redundant
                                     //String targetNodeName = annoSpecs[annoSpecs.length-1];
@@ -257,13 +266,17 @@ public class WebannoTSV2SaltMapper extends PepperMapperImpl{
                                         WebannoTSVMarkable mark;
                                         if (spanAnnoMap.containsKey(markID)){
                                             mark = spanAnnoMap.get(markID); 
-                                            mark.addToken(sToken);
                                         }
                                         else{ 
                                             mark = new WebannoTSVMarkable();
                                             spanAnnoMap.put(markID, mark);                                                    
                                         }
+                                        mark.addToken(sToken);
                                         mark.addAnnotation(namespace,currentAnno.getAnnoName(),annoVal);
+                                        // Check if this is a single-token annotation
+                                        if (Arrays.asList(tokAnnoList).contains(currentAnno.getAnnoName())){
+                                            mark.setIsTokAnno(true);
+                                        }
                                         mark.setNodeName(currentAnno.getNodeName());
                                     }
                                     if (annoIndex < annotations.size()){
@@ -271,25 +284,61 @@ public class WebannoTSV2SaltMapper extends PepperMapperImpl{
                                     }                                                    
                                 }                                                
                                 else if (currentAnno.getType() == WebannoTSVAnnotationType.RELATION) { 
-                                    // Edge annotation, consists of two columns: annotation value, and source_target
-                                    sepAnnos = annoField.split("\\|");
-                                    String relField = iter.next();
-                                    sepRels = relField.split("\\|");
-                                    if (sepAnnos.length < sepRels.length){
-                                        logger.warn("Ignored relation because there were more annotations than edges: " + annoField + "<>" + relField + "\n");
-                                    }
-                                    else {
-                                        for (int i=0;i<sepAnnos.length;i++){
+                                    // Edge annotation, consists of at least two columns: 
+                                    // annotation value(s), and finally source_target
+                                    // use numSisters to determine how many columns to chomp
+                                    int numCols = currentAnno.getNumSisters();
 
-                                            if (i >= sepRels.length) {throw new PepperModuleDataException(this,"Missing edge information for: " + annoField + ":" + relField + "\n");}
-                                            String edgeAnnoValue = sepAnnos[i];
-                                            String edgeSourceTarget = sepRels[i];
-                                            if (edgeSourceTarget.contains("[") && edgeSourceTarget.contains("_")){
-                                                String[] position_source_target = edgeSourceTarget.split("\\[");
-                                                String position = position_source_target[0];
-                                                String[] source_target = position_source_target[1].split("_");
-                                                String source = source_target[0];
-                                                String target = source_target[1].substring(0,source_target[1].length()-1);
+                                    // collect as many additional fields as we have additional columns
+                                    for (int j=1; j < numCols; j++){
+                                        annoField += "\t" + iter.next();
+                                    }
+                                    
+                                    String relField;
+                                    if (iter.hasNext()){
+                                    relField = iter.next();
+                                    }
+                                    else{
+                                        throw new PepperModuleDataException(this, "Anno field is: "  + annoField + " and currentAnnos is: " + currentAnno.getAnnoName() + " and has sisters: " + currentAnno.getNumSisters());
+                                    }
+                                        
+                                    sepRels = relField.split("\\|");
+                                    String sepAnnoField[];
+                                    sepAnnoField = annoField.split("\t");
+
+                                    // iterate over values and assign to appropriate anno objects
+                                    for (int j = 0; j < numCols; j++ ){
+                                        String edgeAnnoValues = sepAnnoField[j]; // contains pipe-separated instances of a single edge anno type
+                                        if (j == 0){
+                                          // do nothing, currentAnno is already correct
+                                        }
+                                        else{
+                                            // advance to second and subsequent edge annos
+                                            annoIndex++;
+                                            currentAnno = annotations.get(annoIndex);
+                                        }
+                                        sepAnnos = edgeAnnoValues.split("\\|");
+                                        if (sepAnnos.length < sepRels.length){
+                                            logger.warn("Ignored relation because there were more annotations than edges: " + edgeAnnoValues + "<>" + relField + "\n");
+                                        }
+                                        else {
+                                            for (int i=0;i<sepAnnos.length;i++){
+                                                if (i >= sepRels.length) {throw new PepperModuleDataException(this,"Missing edge information for: " + edgeAnnoValues + ":" + relField + "\n");}
+                                                String edgeAnnoValue = sepAnnos[i]; // contains a single edge anno label of a single type
+                                                String edgeSourceTarget = sepRels[i];
+                                                String source = "0";
+                                                String target = "0";
+                                                String position;
+                                                if (edgeSourceTarget.contains("[") && edgeSourceTarget.contains("_")){ // relation contains explicit source or target node ID                                                   
+                                                    String[] position_source_target = edgeSourceTarget.split("\\[");
+                                                    position = position_source_target[0];
+                                                    String[] source_target = position_source_target[1].split("_");
+                                                    source = source_target[0];
+                                                    target = source_target[1].substring(0,source_target[1].length()-1);
+                                                }
+                                                else{ // this is a link between two single token spans, just use token IDs
+                                                    position = edgeSourceTarget;
+                                                }
                                                 if (target.equals("0")){
                                                     target = tokID;
                                                 }
@@ -299,10 +348,11 @@ public class WebannoTSV2SaltMapper extends PepperMapperImpl{
 
                                                 WebannoTSVEdge rel = new WebannoTSVEdge(source,target,currentAnno.getNodeName(),currentAnno.getAnnoName(),edgeAnnoValue);
                                                 pointingRelationList.add(rel);
+                                                
                                             }
                                         }
                                     }
-                                    // Only increment annoIndex once for these two columns, 
+                                    // Only increment annoIndex once for these two or more columns, 
                                     // which correspond to one edge annotation type
                                     if (annoIndex < annotations.size()){ 
                                         annoIndex++;
@@ -310,6 +360,10 @@ public class WebannoTSV2SaltMapper extends PepperMapperImpl{
                                 }
 
                             }
+                        } else {
+                            if (annoIndex < annotations.size()){ 
+                                annoIndex++; // moving annoIndex for empty anno column with "_"
+                            }                                                    
                         }
 
                     }
@@ -336,7 +390,7 @@ public class WebannoTSV2SaltMapper extends PepperMapperImpl{
 
             // generate SSpans and attach annotations from HashMap
             // save SSpans in HashMap by markID to link with SPointingRelations later
-            HashMap<String,SSpan> spanIDMap = new HashMap<>();
+            HashMap<String,SStructuredNode> spanIDMap = new HashMap<>();
 
             for (Map.Entry<String, WebannoTSVMarkable> entry : spanAnnoMap.entrySet()) {
                 String ID = entry.getKey();
@@ -344,21 +398,37 @@ public class WebannoTSV2SaltMapper extends PepperMapperImpl{
 
                 // make SSpan above tokens covered by this WebannoTSVMarkable
                 ArrayList<SToken> toksToCover = mark.getTokens();
-                SSpan sSpan = getDocument().getDocumentGraph().createSpan(toksToCover);
-                if (this.namespace != null){
-                    sSpan.addLayer(this.layer);
+                if (mark.isIsTokAnno()){  // handle token annotations
+                    
+                    SToken thisTok = toksToCover.get(0);
+                    // add annotations if not already present
+                    for (SAnnotation anno : mark.getAnnotations()){
+                        if (thisTok.getAnnotation(anno.getNamespace(),anno.getName())== null){
+                            thisTok.addAnnotation(anno);
+                        }
+                    }
+                    spanIDMap.put(ID, thisTok);                    
                 }
-                if (mark.getNodeName()!=null){
-                    sSpan.setName(mark.getNodeName());
-                }
+                else{
+                    SSpan sSpan = getDocument().getDocumentGraph().createSpan(toksToCover);
+                    if (this.namespace != null){
+                        if (sSpan == null){
+                            throw new PepperModuleDataException(this, "Null span detected, created from markable object: " + mark.toString());
+                        }
+                        sSpan.addLayer(this.layer);
+                    }
+                    if (mark.getNodeName()!=null){
+                        sSpan.setName(mark.getNodeName());
+                    }
 
-                // remember SSpan object belonging to this markID
-                spanIDMap.put(ID, sSpan);
+                    // remember SSpan object belonging to this markID
+                    spanIDMap.put(ID, sSpan);
 
-                // add annotations if not already present
-                for (SAnnotation anno : mark.getAnnotations()){
-                    if (sSpan.getAnnotation(anno.getNamespace(),anno.getName())== null){
-                        sSpan.addAnnotation(anno);
+                    // add annotations if not already present
+                    for (SAnnotation anno : mark.getAnnotations()){
+                        if (sSpan.getAnnotation(anno.getNamespace(),anno.getName())== null){
+                            sSpan.addAnnotation(anno);
+                        }
                     }
                 }
             }   
