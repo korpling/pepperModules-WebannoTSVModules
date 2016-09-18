@@ -365,29 +365,33 @@ public class WebannoTSV2SaltMapper extends PepperMapperImpl{
 
             // create SPointingRelations between SSpans if found
             for (WebannoTSVEdge edge : pointingRelationList) {
-                SPointingRelation sRel = SaltFactory.createSPointingRelation();
-                if (spanIDMap.containsKey(edge.getSourceID())){
-                    sRel.setSource(spanIDMap.get(edge.getSourceID()));
+                // Check that source and target are not identical
+                // Note that self-links are valid in WebAnno, but not in Salt
+                if (edge.getSourceID() != edge.getTargetID()) {
+                    SPointingRelation sRel = SaltFactory.createSPointingRelation();
+                    if (spanIDMap.containsKey(edge.getSourceID())){
+                        sRel.setSource(spanIDMap.get(edge.getSourceID()));
+                    }
+                    else{
+                        throw new PepperModuleDataException(this,"Input error: relation with missing source element: " + edge.getSourceID() + "\n" );
+                    }
+                    if (spanIDMap.containsKey(edge.getTargetID())){
+                        sRel.setTarget(spanIDMap.get(edge.getTargetID()));
+                    }
+                    else{
+                        throw new PepperModuleDataException(this,"Input error: relation with missing target element: " + edge.getTargetID() + "\n" );
+                    }
+                    sRel.setType(edge.getType());
+                    SAnnotation relAnno = SaltFactory.createSAnnotation();
+                    if (namespace != null){
+                        relAnno.setNamespace(namespace);
+                        sRel.addLayer(this.layer);
+                    }
+                    relAnno.setName(edge.getAnnoName());
+                    relAnno.setValue(edge.getAnnoValue());
+                    sRel.addAnnotation(relAnno);
+                    getDocument().getDocumentGraph().addRelation(sRel);
                 }
-                else{
-                    throw new PepperModuleDataException(this,"Input error: relation with missing source element: " + edge.getSourceID() + "\n" );
-                }
-                if (spanIDMap.containsKey(edge.getTargetID())){
-                    sRel.setTarget(spanIDMap.get(edge.getTargetID()));
-                }
-                else{
-                    throw new PepperModuleDataException(this,"Input error: relation with missing target element: " + edge.getTargetID() + "\n" );
-                }
-                sRel.setType(edge.getType());
-                SAnnotation relAnno = SaltFactory.createSAnnotation();
-                if (namespace != null){
-                    relAnno.setNamespace(namespace);
-                    sRel.addLayer(this.layer);
-                }
-                relAnno.setName(edge.getAnnoName());
-                relAnno.setValue(edge.getAnnoValue());
-                sRel.addAnnotation(relAnno);
-                getDocument().getDocumentGraph().addRelation(sRel);
             }
 
             return (DOCUMENT_STATUS.COMPLETED);
