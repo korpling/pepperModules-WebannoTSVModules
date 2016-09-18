@@ -28,6 +28,7 @@ public class WebannoTSVMarkable {
     private ArrayList<SToken> tokens;
     private ArrayList<SAnnotation> annotations;
     private String nodeName;
+    private boolean isTokAnno;
 
     public String getNodeName() {
         return nodeName;
@@ -46,6 +47,14 @@ public class WebannoTSVMarkable {
 
     public ArrayList<SAnnotation> getAnnotations() {
         return annotations;
+    }
+
+    public boolean isIsTokAnno() {
+        return isTokAnno;
+    }
+
+    public void setIsTokAnno(boolean isTokAnno) {
+        this.isTokAnno = isTokAnno;
     }
     
 
@@ -69,6 +78,19 @@ public class WebannoTSVMarkable {
 
     void setNodeName(String name) {
         this.nodeName = name;
+    }
+
+    
+    @Override
+    public String toString(){
+        
+        StringBuilder coveredText = new StringBuilder();
+        for (SToken tok : this.tokens){
+            coveredText.append(tok.getId() + " ");
+        }
+        
+        return "WebannoTSVMarkable: " + this.nodeName +  " > " + coveredText.toString();
+              
     }
     
 }

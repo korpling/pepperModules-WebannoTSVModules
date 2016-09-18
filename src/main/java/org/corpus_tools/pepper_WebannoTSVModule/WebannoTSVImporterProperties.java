@@ -30,10 +30,12 @@ public class WebannoTSVImporterProperties extends PepperModuleProperties  {
 
         public final static String NAMESPACE = PREFIX + "namespace";
 	public final static String LOWER_TYPES = PREFIX + "lowerTypes";
+	public final static String TOK_ANNOS = PREFIX + "tokAnnos";
 
 	public WebannoTSVImporterProperties() {
 		this.addProperty(new PepperModuleProperty<String>(NAMESPACE, String.class, "Specifies a namespace to assign to all imported annotations.", "webanno", false));
 		this.addProperty(new PepperModuleProperty<Boolean>(LOWER_TYPES, Boolean.class, "States whether to automatically lower-case all node and edge types, since these are capitalized automatically by Webanno.", false, false));
+		this.addProperty(new PepperModuleProperty<String>(LOWER_TYPES, String.class, "Supplies a semicolon-separated list of annotation names which should be attached directly to token, without creating span nodes above the covered area", "", false));
         }
 
     

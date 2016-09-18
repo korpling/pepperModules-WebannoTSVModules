@@ -25,7 +25,6 @@ import org.corpus_tools.salt.common.STextualRelation;
 import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.SAnnotation;
 import org.corpus_tools.salt.core.SLayer;
-import org.corpus_tools.salt.core.SNode;
 import org.eclipse.emf.common.util.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -296,10 +295,10 @@ public class WebannoTSV2SaltMapper extends PepperMapperImpl{
                                     
                                     String relField;
                                     if (iter.hasNext()){
-                                    relField = iter.next();
+                                        relField = iter.next();
                                     }
                                     else{
-                                        throw new PepperModuleDataException(this, "Anno field is: "  + annoField + " and currentAnnos is: " + currentAnno.getAnnoName() + " and has sisters: " + currentAnno.getNumSisters());
+                                        throw new PepperModuleDataException(this, "Insufficient columns found. Annotation field is: "  + annoField + " and currentAnnos is: " + currentAnno.getAnnoName() + " which has n sisters: " + currentAnno.getNumSisters());
                                     }
                                         
                                     sepRels = relField.split("\\|");
@@ -348,7 +347,6 @@ public class WebannoTSV2SaltMapper extends PepperMapperImpl{
 
                                                 WebannoTSVEdge rel = new WebannoTSVEdge(source,target,currentAnno.getNodeName(),currentAnno.getAnnoName(),edgeAnnoValue);
                                                 pointingRelationList.add(rel);
-                                                
                                             }
                                         }
                                     }
@@ -358,18 +356,13 @@ public class WebannoTSV2SaltMapper extends PepperMapperImpl{
                                         annoIndex++;
                                     }                                                    
                                 }
-
                             }
                         } else {
                             if (annoIndex < annotations.size()){ 
                                 annoIndex++; // moving annoIndex for empty anno column with "_"
                             }                                                    
                         }
-
                     }
-
-
-
                 }
 
                 // Finished reading an input tuple
@@ -437,7 +430,7 @@ public class WebannoTSV2SaltMapper extends PepperMapperImpl{
             for (WebannoTSVEdge edge : pointingRelationList) {
                 // Check that source and target are not identical
                 // Note that self-links are valid in WebAnno, but not in Salt
-                if (edge.getSourceID() != edge.getTargetID()) {
+                if (!edge.getSourceID().equals(edge.getTargetID())) {
                     SPointingRelation sRel = SaltFactory.createSPointingRelation();
                     if (spanIDMap.containsKey(edge.getSourceID())){
                         sRel.setSource(spanIDMap.get(edge.getSourceID()));
