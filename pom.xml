@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.corpus-tools</groupId>
 	<artifactId>pepperModules-WebannoTSVModules</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 	<name>org.corpus-tools.pepperModules-WebannoTSVModules</name>
 	<!-- Declares this project to be an extension of the project pepper-parentModule. -->
@@ -39,8 +39,4 @@
             <type>jar</type>
         </dependency>
     </dependencies>
-
-  <scm>
-    <tag>pepperModules-WebannoTSVModules-1.0.0</tag>
-  </scm>
 </project>
