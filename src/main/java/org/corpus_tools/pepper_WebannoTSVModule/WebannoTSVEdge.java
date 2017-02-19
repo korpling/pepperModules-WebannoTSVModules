@@ -21,66 +21,64 @@ package org.corpus_tools.pepper_WebannoTSVModule;
  */
 public class WebannoTSVEdge {
 
-    private String sourceID;
-    private String targetID;
-    private String type;
-    private String annoName;
-    private String annoValue;
-    
-    WebannoTSVEdge() {
+	private String sourceID;
+	private String targetID;
+	private String type;
+	private String annoName;
+	private String annoValue;
 
-    }
+	WebannoTSVEdge() {
 
-    public WebannoTSVEdge(String sourceID, String targetID, String type, String annoName, String annoValue) {
+	}
 
-        this.sourceID = sourceID;
-        this.targetID = targetID;
-        this.type = type;
-        this.annoName = annoName;
-        this.annoValue = annoValue;
+	public WebannoTSVEdge(String sourceID, String targetID, String type, String annoName, String annoValue) {
 
-    }
+		this.sourceID = sourceID;
+		this.targetID = targetID;
+		this.type = type;
+		this.annoName = annoName;
+		this.annoValue = annoValue;
 
-    public String getSourceID() {
-        return sourceID;
-    }
+	}
 
-    public String getTargetID() {
-        return targetID;
-    }
+	public String getSourceID() {
+		return sourceID;
+	}
 
-    public String getType() {
-        return type;
-    }
+	public String getTargetID() {
+		return targetID;
+	}
 
-    public String getAnnoName() {
-        return annoName;
-    }
+	public String getType() {
+		return type;
+	}
 
-    public String getAnnoValue() {
-        return annoValue;
-    }
+	public String getAnnoName() {
+		return annoName;
+	}
 
-    public void setSourceID(String sourceID) {
-        this.sourceID = sourceID;
-    }
+	public String getAnnoValue() {
+		return annoValue;
+	}
 
-    public void setTargetID(String targetID) {
-        this.targetID = targetID;
-    }
+	public void setSourceID(String sourceID) {
+		this.sourceID = sourceID;
+	}
 
-    public void setType(String type) {
-        this.type = type;
-    }
+	public void setTargetID(String targetID) {
+		this.targetID = targetID;
+	}
 
-    public void setAnnoName(String annoName) {
-        this.annoName = annoName;
-    }
+	public void setType(String type) {
+		this.type = type;
+	}
 
-    public void setAnnoValue(String annoValue) {
-        this.annoValue = annoValue;
-    }
-    
-    
-    
+	public void setAnnoName(String annoName) {
+		this.annoName = annoName;
+	}
+
+	public void setAnnoValue(String annoValue) {
+		this.annoValue = annoValue;
+	}
+
 }

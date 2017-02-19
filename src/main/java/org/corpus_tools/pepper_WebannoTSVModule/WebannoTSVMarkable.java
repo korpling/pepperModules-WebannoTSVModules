@@ -16,6 +16,7 @@
 package org.corpus_tools.pepper_WebannoTSVModule;
 
 import java.util.ArrayList;
+
 import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.SAnnotation;
@@ -25,72 +26,70 @@ import org.corpus_tools.salt.core.SAnnotation;
  * @author Amir Zeldes
  */
 public class WebannoTSVMarkable {
-    private ArrayList<SToken> tokens;
-    private ArrayList<SAnnotation> annotations;
-    private String nodeName;
-    private boolean isTokAnno;
+	private ArrayList<SToken> tokens;
+	private ArrayList<SAnnotation> annotations;
+	private String nodeName;
+	private boolean isTokAnno;
 
-    public String getNodeName() {
-        return nodeName;
-    }
-    
-    WebannoTSVMarkable(){
+	public String getNodeName() {
+		return nodeName;
+	}
 
-        this.tokens = new ArrayList<>();
-        this.annotations = new ArrayList<>();
-             
-    }
+	WebannoTSVMarkable() {
 
-    public WebannoTSVMarkable(ArrayList<SToken> tokens) {
-        this.tokens = tokens;
-    }
+		this.tokens = new ArrayList<>();
+		this.annotations = new ArrayList<>();
 
-    public ArrayList<SAnnotation> getAnnotations() {
-        return annotations;
-    }
+	}
 
-    public boolean isIsTokAnno() {
-        return isTokAnno;
-    }
+	public WebannoTSVMarkable(ArrayList<SToken> tokens) {
+		this.tokens = tokens;
+	}
 
-    public void setIsTokAnno(boolean isTokAnno) {
-        this.isTokAnno = isTokAnno;
-    }
-    
+	public ArrayList<SAnnotation> getAnnotations() {
+		return annotations;
+	}
 
-    public ArrayList<SToken> getTokens() {
-        return tokens;
-    }
+	public boolean isIsTokAnno() {
+		return isTokAnno;
+	}
 
-    public void addAnnotation(String namespace, String annoName, String annoValue){
-        SAnnotation sAnno = SaltFactory.createSAnnotation();
-        sAnno.setNamespace(namespace);
-        sAnno.setName(annoName);
-        sAnno.setValue(annoValue);
-        this.annotations.add(sAnno);
-    }
-    
-    public void addToken(SToken tok){
-        if (!this.tokens.contains(tok)){
-            this.tokens.add(tok);
-        }
-    }
+	public void setIsTokAnno(boolean isTokAnno) {
+		this.isTokAnno = isTokAnno;
+	}
 
-    void setNodeName(String name) {
-        this.nodeName = name;
-    }
+	public ArrayList<SToken> getTokens() {
+		return tokens;
+	}
 
-    
-    @Override
-    public String toString(){
-        
-        StringBuilder coveredText = new StringBuilder();
-        for (SToken tok : this.tokens){
-            coveredText.append(tok.getId() + " ");
-        }
-        
-        return "WebannoTSVMarkable: " + this.nodeName +  " > " + coveredText.toString();
-              
-    }
-    
+	public void addAnnotation(String namespace, String annoName, String annoValue) {
+		SAnnotation sAnno = SaltFactory.createSAnnotation();
+		sAnno.setNamespace(namespace);
+		sAnno.setName(annoName);
+		sAnno.setValue(annoValue);
+		this.annotations.add(sAnno);
+	}
+
+	public void addToken(SToken tok) {
+		if (!this.tokens.contains(tok)) {
+			this.tokens.add(tok);
+		}
+	}
+
+	void setNodeName(String name) {
+		this.nodeName = name;
+	}
+
+	@Override
+	public String toString() {
+
+		StringBuilder coveredText = new StringBuilder();
+		for (SToken tok : this.tokens) {
+			coveredText.append(tok.getId() + " ");
+		}
+
+		return "WebannoTSVMarkable: " + this.nodeName + " > " + coveredText.toString();
+
+	}
+
 }

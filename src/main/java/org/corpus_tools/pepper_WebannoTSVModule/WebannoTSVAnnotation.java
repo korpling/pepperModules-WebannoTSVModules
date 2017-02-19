@@ -21,56 +21,53 @@ package org.corpus_tools.pepper_WebannoTSVModule;
  */
 public class WebannoTSVAnnotation {
 
+	public enum WebannoTSVAnnotationType {
+		SPAN, RELATION;
 
-    public enum WebannoTSVAnnotationType{
-    	SPAN, RELATION;
+	}
 
-    }
-    
 	private final WebannoTSVAnnotationType type;
 	private final String nodeName;
 	private final String annoName;
-	private final int numSisters; // records the number of coordinate annotations this annotations element carries
+	private final int numSisters; // records the number of coordinate
+									// annotations this annotations element
+									// carries
 
-    
-    WebannoTSVAnnotation(WebannoTSVAnnotationType type, String nodeName, String annoName) {
+	WebannoTSVAnnotation(WebannoTSVAnnotationType type, String nodeName, String annoName) {
 		this.type = type;
-                this.nodeName = nodeName;
-                this.annoName = annoName;
-                this.numSisters = 1;
-        
-    }
+		this.nodeName = nodeName;
+		this.annoName = annoName;
+		this.numSisters = 1;
 
-    WebannoTSVAnnotation(WebannoTSVAnnotationType type, String nodeName, String annoName, int sisters) {
+	}
+
+	WebannoTSVAnnotation(WebannoTSVAnnotationType type, String nodeName, String annoName, int sisters) {
 		this.type = type;
-                this.nodeName = nodeName;
-                this.annoName = annoName;
-                this.numSisters = sisters;
-        
-    }
-    
-    
-    public WebannoTSVAnnotationType getType() {
-        return this.type;
-    }
+		this.nodeName = nodeName;
+		this.annoName = annoName;
+		this.numSisters = sisters;
 
-    public String getNodeName() {
-        return nodeName;
-    }
+	}
 
-    public String getAnnoName() {
-        return annoName;
-    }
+	public WebannoTSVAnnotationType getType() {
+		return this.type;
+	}
 
-    public int getNumSisters() {
-        return numSisters;
-    }
+	public String getNodeName() {
+		return nodeName;
+	}
 
-    @Override
-    public String toString() {
-        return type + ": " + nodeName + "@" + annoName;
-    }
+	public String getAnnoName() {
+		return annoName;
+	}
 
-    
+	public int getNumSisters() {
+		return numSisters;
+	}
+
+	@Override
+	public String toString() {
+		return type + ": " + nodeName + "@" + annoName;
+	}
+
 }
-

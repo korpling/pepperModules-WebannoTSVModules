@@ -38,9 +38,9 @@ import org.slf4j.LoggerFactory;
  * @author Amir Zeldes
  */
 @Component(name = "WebannoTSVImporterComponent", factory = "PepperImporterComponentFactory")
-public class WebannoTSVImporter extends PepperImporterImpl implements PepperImporter{
+public class WebannoTSVImporter extends PepperImporterImpl implements PepperImporter {
 
-        private static final Logger logger = LoggerFactory.getLogger(WebannoTSVImporter.class);
+	private static final Logger logger = LoggerFactory.getLogger(WebannoTSVImporter.class);
 
 	public WebannoTSVImporter() {
 		super();
@@ -49,12 +49,11 @@ public class WebannoTSVImporter extends PepperImporterImpl implements PepperImpo
 		setSupplierHomepage(URI.createURI(PepperConfiguration.HOMEPAGE));
 		setDesc("This is an importer module for the WebAnnos TSV format (V3). It imports token, span annotations and relations from the WebAnno TSV export format. Sentence spans may optionally be imported based on sentence breaks in the input file.");
 
-                this.addSupportedFormat("WebannoTSV", "3.0", null);
+		this.addSupportedFormat("WebannoTSV", "3.0", null);
 
-                getDocumentEndings().add(PepperImporter.ENDING_ALL_FILES);
+		getDocumentEndings().add(PepperImporter.ENDING_ALL_FILES);
 
 	}
-	
 
 	/**
 	 * @param corpusGraph
@@ -73,8 +72,9 @@ public class WebannoTSVImporter extends PepperImporterImpl implements PepperImpo
 	}
 
 	/**
-	 * This method creates a customized {@link PepperMapper} object for the 
-         * WebannoTSV format and returns it. 
+	 * This method creates a customized {@link PepperMapper} object for the
+	 * WebannoTSV format and returns it.
+	 * 
 	 * @param Identifier
 	 *            {@link Identifier} of the {@link SCorpus} or {@link SDocument}
 	 *            to be processed.
@@ -83,10 +83,8 @@ public class WebannoTSVImporter extends PepperImporterImpl implements PepperImpo
 	 */
 	public PepperMapper createPepperMapper(Identifier Identifier) {
 		WebannoTSV2SaltMapper mapper = new WebannoTSV2SaltMapper();
-                return (mapper);
+		return (mapper);
 	}
-
-
 
 	/**
 	 * This method is called by the pepper framework and returns if a corpus
@@ -114,7 +112,7 @@ public class WebannoTSVImporter extends PepperImporterImpl implements PepperImpo
 	@Override
 	public boolean isReadyToStart() throws PepperModuleNotReadyException {
 
-            //return (super.isReadyToStart());
-            return true;
+		// return (super.isReadyToStart());
+		return true;
 	}
 }
