@@ -516,14 +516,17 @@ public class WebannoTSV2SaltMapper extends PepperMapperImpl {
 				}
 				sRel.setType(edge.getType());
 				SAnnotation relAnno = SaltFactory.createSAnnotation();
-				if (namespace != null) {
-					relAnno.setNamespace(namespace);
-					sRel.addLayer(this.layer);
-				}
+				
 				relAnno.setName(edge.getAnnoName());
 				relAnno.setValue(edge.getAnnoValue());
 				sRel.addAnnotation(relAnno);
 				getDocument().getDocumentGraph().addRelation(sRel);
+        
+        // adding the edge to the layer after it has been added to the graph, otherwise it is added twice
+        if (namespace != null) {
+					relAnno.setNamespace(namespace);
+					sRel.addLayer(this.layer);
+				}
 			}
 		}
 
