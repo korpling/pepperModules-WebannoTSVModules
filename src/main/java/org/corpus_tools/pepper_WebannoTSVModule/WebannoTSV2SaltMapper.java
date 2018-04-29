@@ -106,17 +106,11 @@ public class WebannoTSV2SaltMapper extends PepperMapperImpl {
 				"webanno");
 		this.tokAnnos = (String) getProperties().getProperties().getProperty(WebannoTSVImporterProperties.TOK_ANNOS,
 				"");
+                this.lowercaseTypes = Boolean.valueOf(getProperties().getProperties().getProperty(WebannoTSVImporterProperties.LOWER_TYPES));
 
 		String[] tokAnnoList;
 		tokAnnoList = this.tokAnnos.split(";");
 
-		if (getProperties().getProperty(WebannoTSVImporterProperties.LOWER_TYPES).getValue() instanceof Boolean) {
-			this.lowercaseTypes = (Boolean) getProperties().getProperty(WebannoTSVImporterProperties.LOWER_TYPES)
-					.getValue();
-		} else {
-			this.lowercaseTypes = Boolean
-					.valueOf((String) getProperties().getProperty(WebannoTSVImporterProperties.LOWER_TYPES).getValue());
-		}
 		if (this.namespace != null) {
 			this.layer = SaltFactory.createSLayer();
 			this.layer.setName(this.namespace);
