@@ -35,7 +35,7 @@ bash pepperStart.sh
 
 Then type in command *is* and the path from where to install the module:
 ```
-pepper> update de.hu_berlin.german.korpling.saltnpepper::pepperModules-WebannoTSVModules::https://korpling.german.hu-berlin.de/maven2/
+pepper> update de.hu_berlin.german.korpling.saltnpepper::pepperModules-WebannoTSVModules::https://repo1.maven.org/maven2/
 ```
 
 ## Usage

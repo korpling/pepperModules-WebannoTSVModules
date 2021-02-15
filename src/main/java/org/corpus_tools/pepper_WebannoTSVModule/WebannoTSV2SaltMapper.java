@@ -430,9 +430,9 @@ public class WebannoTSV2SaltMapper extends PepperMapperImpl {
 			}
 
 			// Finished reading an input tuple
-			processedTuples++;
-			if ((int) ((processedTuples / numOfTuples) * 100) % 10 == 0) {
-				addProgress((double) (processedTuples / numOfTuples));
+			//processedTuples++;
+			if ((int) ((rowIndex / numOfTuples) * 100) % 10 == 0) {
+				addProgress((double) (rowIndex / numOfTuples));
 			}
 
 		}
